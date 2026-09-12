@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -51,6 +50,12 @@
         .phases summary { cursor: pointer; font-weight: 600; font-size: 0.85rem; color: #e6edf3; }
         .phases ul { margin: 0.6rem 0 0.2rem 1.2rem; color: #8b949e; font-size: 0.82rem; }
         .phases li { margin-bottom: 0.3rem; }
+        .phases p { color: #8b949e; font-size: 0.82rem; margin: 0.6rem 0; }
+        .phases img { width: 100%; border-radius: 8px; border: 1px solid #30363d; margin: 0.7rem 0; }
+        .phases .caption { font-size: 0.72rem; color: #6e7681; text-align: center; margin-top: -0.4rem; margin-bottom: 0.8rem; font-style: italic; }
+        .phases table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin: 0.6rem 0; }
+        .phases th, .phases td { border: 1px solid #30363d; padding: 0.4rem 0.6rem; text-align: left; color: #8b949e; }
+        .phases th { color: #e6edf3; background: #161b22; }
         .stats { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 3rem 2rem; margin: 2rem 0; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; text-align: center; }
         .stat h3 { font-size: 2.5rem; font-weight: 700; color: #58a6ff; }
@@ -142,42 +147,77 @@
 
             <div class="phases">
                 <details>
-                    <summary>Exploratory analysis (Excel)</summary>
+                    <summary>1. Exploratory analysis (Excel)</summary>
+                    <p>Portfolio risk varies sharply by city. Cali carries the highest delinquency rate in the network (22.93% of its portfolio) versus a national average of 11.05%, and accounts for 29% of total overdue balance despite not having the largest loan volume. Rionegro and Soacha, by contrast, show the healthiest behavior (5% and 7% delinquency).</p>
+                    <img src="fincrece-cartera-ciudad.png" alt="Total portfolio vs. overdue portfolio by city">
+                    <div class="caption">Figure 1. Total portfolio vs. overdue portfolio by city</div>
                     <ul>
-                        <li>Total and overdue portfolio balance by city</li>
-                        <li>Top 5 advisors by overdue balance</li>
-                        <li>Client/balance distribution by product and sector</li>
-                        <li>Geographic misalignment detection</li>
+                        <li>Individual Microloan has the highest delinquency rate (22%) — 5.5x higher than Revolving Credit (4%, the healthiest product)</li>
+                        <li>Two of ten advisors (ASE_004, ASE_005) account for 49% of total overdue balance, and both exceed their maximum client capacity</li>
+                        <li>93% of clients (297 of 320) are assigned to an advisor based in a different city — the structural problem addressed in the optimization phase</li>
                     </ul>
                 </details>
+
                 <details>
-                    <summary>Client segmentation (Python)</summary>
+                    <summary>2. Client segmentation (Python)</summary>
+                    <p>K-Means clustering on scaled portfolio balance, days overdue, estimated monthly income, and disbursed amount identified four distinct client segments, validated with the elbow method and silhouette score:</p>
+                    <table>
+                        <tr><th>Segment</th><th>Description</th><th>Clients</th></tr>
+                        <tr><td>High risk</td><td>Delinquency far above the rest (67 days on average)</td><td>32</td></tr>
+                        <tr><td>Standard base</td><td>Largest client volume, lower income, controlled delinquency</td><td>135</td></tr>
+                        <tr><td>High value</td><td>Larger loan sizes, moderate delinquency</td><td>78</td></tr>
+                        <tr><td>Low risk</td><td>High income, minimal delinquency</td><td>75</td></tr>
+                    </table>
+                    <img src="fincrece-segmentos.png" alt="Variable distribution by K-Means segment">
+                    <div class="caption">Figure 2. Distribution of key variables across the four K-Means segments</div>
                     <ul>
-                        <li>K-Means clustering on behavior and risk variables</li>
-                        <li>Missing values, outlier handling, feature scaling</li>
-                        <li>Business interpretation of each segment</li>
+                        <li>As a complementary check, a hierarchical dendrogram of the 10 advisors (by delinquency rate, client count, total portfolio) confirmed the same risk concentration found in the exploratory phase</li>
                     </ul>
                 </details>
+
                 <details>
-                    <summary>Geolocation & assignment optimization</summary>
+                    <summary>3. Geolocation & assignment optimization</summary>
+                    <p>Haversine distance was calculated between all 320 clients and 10 advisors, then a linear programming model (PuLP) solved for the assignment that minimizes total travel distance while respecting each advisor's maximum client capacity. Along the way, coordinate data-entry errors were detected and corrected in 62 records (24 missing a longitude digit, 38 missing a latitude digit).</p>
+                    <img src="fincrece-mapa.png" alt="Map of clients and advisors under the proposed assignment">
+                    <div class="caption">Figure 3. Client/advisor map under the proposed optimal assignment (Python / folium)</div>
                     <ul>
-                        <li>Client-advisor distance calculation from coordinates</li>
-                        <li>Reassignment model minimizing total travel distance</li>
-                        <li>Map visualization of clients, advisors, and zones</li>
+                        <li>Average client-advisor distance dropped from 276.4 km to 30.0 km — an <strong>89.5% reduction</strong></li>
+                        <li>Because total advisor capacity (310 slots) is below the client count (320), 10 clients (3.1%) can't be placed under the optimal proposal without violating capacity constraints — a structural gap worth evaluating for sales-force expansion</li>
+                        <li>Limitation: distance optimization alone doesn't change historical payment behavior — delinquency simply redistributes across advisors (ASE_004/ASE_005 are relieved, ASE_007/ASE_010 absorb more exposure). A controlled pilot is recommended to test whether better coverage actually improves repayment over time</li>
                     </ul>
                 </details>
+
                 <details>
-                    <summary>Management dashboard (Power BI)</summary>
+                    <summary>4. Management dashboard (Power BI)</summary>
+                    <p>An interactive dashboard consolidates portfolio and delinquency by city and product, client distribution by delinquency range and by segment, client/advisor maps, and a highest-risk advisor view — filterable by period, city, and advisor. Includes a non-trivial DAX measure (% Overdue Portfolio, using DIVIDE to avoid division-by-zero errors).</p>
+                    <img src="fincrece-dashboard.png" alt="Power BI management dashboard">
+                    <div class="caption">Figure 4. Power BI management dashboard</div>
                     <ul>
-                        <li>Portfolio and delinquency by city/product</li>
-                        <li>Delinquency ranges: 0-30 / 31-60 / 61-90 / 90+ days</li>
-                        <li>Segment distribution and risk map, filterable by date/city/advisor</li>
+                        <li>63.2% of the portfolio is current, and only 3% is over 60 days overdue — risk is concentrated in the early delinquency bracket (0-30 days, 25.8%), meaning most problem cases are still recoverable with timely collections follow-up</li>
                     </ul>
                 </details>
+
                 <details>
-                    <summary>Project challenges</summary>
+                    <summary>5. Scenario analysis: portfolio expansion in Cali</summary>
+                    <p>As a complementary exercise, three origination policies were evaluated for allocating $1,000M COP in new credit lines in Cali, using observed (not assumed) segment-level delinquency rates:</p>
+                    <table>
+                        <tr><th>Scenario</th><th>Policy</th><th>Expected portfolio at risk</th></tr>
+                        <tr><td>Pessimistic</td><td>No segment filtering</td><td>$229.3M</td></tr>
+                        <tr><td>Medium</td><td>Excluding High-risk segment</td><td>$193.3M</td></tr>
+                        <tr><td>Optimistic</td><td>Only Low-risk & Standard-base segments</td><td>$0*</td></tr>
+                    </table>
                     <ul>
-                        <li><em>To be completed at the end of the project.</em></li>
+                        <li>Which segment receives new credit has up to a $229M swing in financial impact, without restricting commercial growth</li>
+                        <li>Recommendation: prioritize Revolving Credit in Manufacturing, Agroindustry, and matching profiles; Rionegro stands out for expansion into Entrepreneurship and Group Solidarity Credit lines (0% observed delinquency)</li>
+                    </ul>
+                </details>
+
+                <details>
+                    <summary>Recommendations & next steps</summary>
+                    <ul>
+                        <li>Audit the portfolios of advisors ASE_004 and ASE_005, and evaluate hiring or redistributing capacity to close the 10-client structural gap found in the optimization phase</li>
+                        <li>Review origination conditions for the Individual Microloan product</li>
+                        <li>For the 2027 planning cycle, build a Tornado-table sensitivity analysis on delinquency rate, budget, and growth contingency</li>
                     </ul>
                 </details>
             </div>
