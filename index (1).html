@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andrés Cerquera — BI Specialist</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; }
+        nav { background: #161b22; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 100; }
+        nav .logo { font-size: 1.2rem; font-weight: 700; color: #58a6ff; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav ul a { color: #e6edf3; text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+        nav ul a:hover { color: #58a6ff; }
+        .hero { padding: 5rem 2rem; text-align: center; background: linear-gradient(135deg, #161b22 0%, #0d1117 100%); border-bottom: 1px solid #30363d; }
+        .hero h1 { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; }
+        .hero h1 span { color: #58a6ff; }
+        .hero p { font-size: 1.2rem; color: #8b949e; max-width: 600px; margin: 0 auto 2rem; }
+        .badges { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+        .badge { background: #21262d; border: 1px solid #30363d; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; color: #58a6ff; }
+        .btn { background: #238636; color: white; padding: 0.75rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background 0.3s; display: inline-block; margin: 0.5rem; }
+        .btn:hover { background: #2ea043; }
+        .btn.outline { background: transparent; border: 1px solid #30363d; color: #e6edf3; }
+        .btn.outline:hover { background: #21262d; }
+        .section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+        .section h2 { font-size: 2rem; font-weight: 700; margin-bottom: 2rem; text-align: center; }
+        .section h2 span { color: #58a6ff; }
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+        .skill-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.3s, border-color 0.3s; }
+        .skill-card:hover { transform: translateY(-4px); border-color: #58a6ff; }
+        .skill-card .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .skill-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .skill-card p { font-size: 0.85rem; color: #8b949e; }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+        .project-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; transition: transform 0.3s, border-color 0.3s; }
+        .project-card:hover { transform: translateY(-4px); border-color: #58a6ff; }
+        .project-card .tag { background: #1f6feb33; color: #58a6ff; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; display: inline-block; margin-bottom: 1rem; }
+        .project-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .project-card p { font-size: 0.9rem; color: #8b949e; line-height: 1.6; margin-bottom: 1rem; }
+        .project-card .tools { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .tool { background: #21262d; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; color: #8b949e; }
+        .highlight { border-color: #58a6ff; background: #1f6feb11; }
+        .highlight .tag { background: #238636; color: white; }
+        .stats { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 3rem 2rem; margin: 2rem 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; text-align: center; }
+        .stat h3 { font-size: 2.5rem; font-weight: 700; color: #58a6ff; }
+        .stat p { font-size: 0.9rem; color: #8b949e; margin-top: 0.5rem; }
+        .contact { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 3rem; text-align: center; margin: 2rem 0; }
+        .contact h2 { font-size: 2rem; margin-bottom: 1rem; }
+        .contact p { color: #8b949e; margin-bottom: 2rem; }
+        .contact-links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        footer { text-align: center; padding: 2rem; color: #8b949e; font-size: 0.85rem; border-top: 1px solid #30363d; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">andrees-star</div>
+    <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</nav>
+
+<section class="hero">
+    <h1>Andrés <span>Cerquera</span></h1>
+    <p>BI Specialist & Data Analyst — turning raw data into strategic decisions through Python, Power BI and Machine Learning.</p>
+    <div class="badges">
+        <span class="badge">🐍 Python</span>
+        <span class="badge">📊 Power BI</span>
+        <span class="badge">📈 Excel</span>
+        <span class="badge">🤖 Machine Learning</span>
+        <span class="badge">🗄️ SQL</span>
+        <span class="badge">☁️ Azure ML</span>
+    </div>
+    <a href="#projects" class="btn">View Projects</a>
+    <a href="https://github.com/andrees-star" class="btn outline" target="_blank">GitHub Profile</a>
+</section>
+
+<div class="section">
+    <div class="stats">
+        <div class="stats-grid">
+            <div class="stat"><h3>320</h3><p>Clients analyzed in FinCrece project</p></div>
+            <div class="stat"><h3>89.5%</h3><p>Distance reduction with optimization</p></div>
+            <div class="stat"><h3>4</h3><p>Client segments identified with K-Means</p></div>
+            <div class="stat"><h3>12+</h3><p>GitHub repositories</p></div>
+        </div>
+    </div>
+</div>
+
+<section class="section" id="skills">
+    <h2>Technical <span>Skills</span></h2>
+    <div class="skills-grid">
+        <div class="skill-card">
+            <div class="icon">🐍</div>
+            <h3>Python</h3>
+            <p>Pandas, Scikit-learn, PuLP, Folium, Matplotlib</p>
+        </div>
+        <div class="skill-card">
+            <div class="icon">📊</div>
+            <h3>Power BI</h3>
+            <p>DAX, data modeling, interactive dashboards</p>
+        </div>
+        <div class="skill-card">
+            <div class="icon">📈</div>
+            <h3>Excel</h3>
+            <p>Pivot tables, scenario manager, advanced formulas</p>
+        </div>
+        <div class="skill-card">
+            <div class="icon">🤖</div>
+            <h3>Machine Learning</h3>
+            <p>K-Means, XGBoost, Logistic Regression, MLOps</p>
+        </div>
+        <div class="skill-card">
+            <div class="icon">🗄️</div>
+            <h3>SQL</h3>
+            <p>Data querying, aggregations, joins</p>
+        </div>
+        <div class="skill-card">
+            <div class="icon">☁️</div>
+            <h3>Azure ML</h3>
+            <p>End-to-end ML pipelines, model deployment</p>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="projects">
+    <h2>Featured <span>Projects</span></h2>
+    <div class="projects-grid">
+        <div class="project-card highlight">
+            <span class="tag">⭐ Featured</span>
+            <h3>BI Analysis — Corporación FinCrece</h3>
+            <p>Complete BI analysis for a microfinance institution: client segmentation with K-Means, geographic optimization with linear programming, risk scenario analysis and interactive Power BI dashboard.</p>
+            <div class="tools">
+                <span class="tool">Python</span>
+                <span class="tool">Power BI</span>
+                <span class="tool">Excel</span>
+                <span class="tool">PuLP</span>
+                <span class="tool">K-Means</span>
+                <span class="tool">Folium</span>
+            </div>
+        </div>
+        <div class="project-card">
+            <span class="tag">MLOps</span>
+            <h3>Corporate Insolvency Prediction</h3>
+            <p>End-to-end corporate insolvency prediction system using Python and Azure Machine Learning, with automated pipelines and model deployment.</p>
+            <div class="tools">
+                <span class="tool">Python</span>
+                <span class="tool">Azure ML</span>
+                <span class="tool">MLOps</span>
+                <span class="tool">XGBoost</span>
+            </div>
+        </div>
+        <div class="project-card">
+            <span class="tag">Machine Learning</span>
+            <h3>PROYECTO-TRINITY</h3>
+            <p>Advanced machine learning project with Python — predictive modeling and data analysis.</p>
+            <div class="tools">
+                <span class="tool">Python</span>
+                <span class="tool">Scikit-learn</span>
+                <span class="tool">Pandas</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section" id="contact">
+    <div class="contact">
+        <h2>Get in <span style="color:#58a6ff">Touch</span></h2>
+        <p>Open to new opportunities in BI, Data Analytics and Machine Learning.</p>
+        <div class="contact-links">
+            <a href="https://github.com/andrees-star" class="btn" target="_blank">GitHub</a>
+            <a href="mailto:acerquera@example.com" class="btn outline">Email</a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>Built with ❤️ by Andrés Cerquera — andrees-star.github.io</p>
+</footer>
+
+</body>
+</html>
