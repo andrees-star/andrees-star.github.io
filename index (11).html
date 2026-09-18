@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andrés Cerquera — BI Specialist</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; }
+        nav { background: #161b22; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 100; }
+        nav .logo { font-size: 1.2rem; font-weight: 700; color: #58a6ff; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav ul a { color: #e6edf3; text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+        nav ul a:hover { color: #58a6ff; }
+        .hero { padding: 5rem 2rem; text-align: center; background: linear-gradient(135deg, #161b22 0%, #0d1117 100%); border-bottom: 1px solid #30363d; }
+        .hero h1 { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; }
+        .hero h1 span { color: #58a6ff; }
+        .hero p { font-size: 1.2rem; color: #8b949e; max-width: 600px; margin: 0 auto 2rem; }
+        .badges { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+        .badge { background: #21262d; border: 1px solid #30363d; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; color: #58a6ff; }
+        .btn { background: #238636; color: white; padding: 0.75rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background 0.3s; display: inline-block; margin: 0.5rem; }
+        .btn:hover { background: #2ea043; }
+        .btn.outline { background: transparent; border: 1px solid #30363d; color: #e6edf3; }
+        .btn.outline:hover { background: #21262d; }
+        .section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+        .section h2 { font-size: 2rem; font-weight: 700; margin-bottom: 2rem; text-align: center; }
+        .section h2 span { color: #58a6ff; }
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+        .skill-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.3s, border-color 0.3s; }
+        .skill-card:hover { transform: translateY(-4px); border-color: #58a6ff; }
+        .skill-card .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .skill-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .skill-card p { font-size: 0.85rem; color: #8b949e; }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+        .project-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; transition: transform 0.3s, border-color 0.3s; }
+        .project-card:hover { transform: translateY(-4px); border-color: #58a6ff; }
+        .project-card .tag { background: #1f6feb33; color: #58a6ff; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; display: inline-block; margin-bottom: 1rem; }
+        .project-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .project-card p { font-size: 0.9rem; color: #8b949e; line-height: 1.6; margin-bottom: 1rem; }
+        .project-card .tools { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .tool { background: #21262d; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; color: #8b949e; }
+        .project-card .project-links { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .project-link { background: #238636; color: white; padding: 0.35rem 0.9rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; text-decoration: none; transition: background 0.3s; }
+        .project-link:hover { background: #2ea043; }
+        .project-link.secondary { background: transparent; border: 1px solid #30363d; color: #e6edf3; }
+        .project-link.secondary:hover { background: #21262d; }
+        .project-link.blue { background: #1f6feb; }
+        .project-link.blue:hover { background: #388bfd; }
+        .highlight { border-color: #58a6ff; background: #1f6feb11; }
+        .highlight .tag { background: #238636; color: white; }
+        .finance-card { border-color: #d29922; background: #9e6a0311; }
+        .finance-card .tag { background: #9e6a0333; color: #d29922; }
+        .stats { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 3rem 2rem; margin: 2rem 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; text-align: center; }
+        .stat h3 { font-size: 2.5rem; font-weight: 700; color: #58a6ff; }
+        .stat p { font-size: 0.9rem; color: #8b949e; margin-top: 0.5rem; }
+        .contact { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 3rem; text-align: center; margin: 2rem 0; }
+        .contact h2 { font-size: 2rem; margin-bottom: 1rem; }
+        .contact p { color: #8b949e; margin-bottom: 2rem; }
+        .contact-links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        footer { text-align: center; padding: 2rem; color: #8b949e; font-size: 0.85rem; border-top: 1px solid #30363d; }
+        /* YouTube section */
+        .yt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .yt-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; transition: transform 0.3s, border-color 0.3s; text-decoration: none; color: inherit; display: block; }
+        .yt-card:hover { transform: translateY(-4px); border-color: #ff4444; }
+        .yt-thumb { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; }
+        .yt-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
+        .yt-card:hover .yt-thumb img { transform: scale(1.04); }
+        .yt-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.35); opacity: 0; transition: opacity 0.3s; }
+        .yt-card:hover .yt-play { opacity: 1; }
+        .yt-play svg { width: 52px; height: 52px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
+        .yt-info { padding: 1rem 1.1rem 1.2rem; }
+        .yt-info .yt-tag { background: #ff444422; color: #ff6b6b; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.72rem; display: inline-block; margin-bottom: 0.5rem; border: 1px solid #ff444444; }
+        .yt-info h4 { font-size: 0.95rem; font-weight: 700; line-height: 1.4; margin-bottom: 0.3rem; }
+        .yt-info p { font-size: 0.82rem; color: #8b949e; }
+        .yt-channel-link { display: inline-flex; align-items: center; gap: 0.5rem; background: #ff0000; color: white; padding: 0.65rem 1.4rem; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: background 0.3s; }
+        .yt-channel-link:hover { background: #cc0000; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">andrees-star</div>
+    <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#youtube">YouTube</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</nav>
+
+<section class="hero">
+    <h1>Andrés <span>Cerquera</span></h1>
+    <p>BI Specialist & Data Analyst — turning raw data into strategic decisions through Python, Power BI and Machine Learning.</p>
+    <div class="badges">
+        <span class="badge">🐍 Python</span>
+        <span class="badge">📊 Power BI</span>
+        <span class="badge">📈 Excel</span>
+        <span class="badge">🤖 Machine Learning</span>
+        <span class="badge">🗄️ SQL</span>
+        <span class="badge">☁️ Azure ML</span>
+    </div>
+    <a href="#projects" class="btn">View Projects</a>
+    <a href="https://github.com/andrees-star" class="btn outline" target="_blank">GitHub Profile</a>
+</section>
+
+<div class="section" id="about">
+    <div class="stats">
+        <div class="stats-grid">
+            <div class="stat"><h3>320</h3><p>Clients analyzed in FinCrece project</p></div>
+            <div class="stat"><h3>89.5%</h3><p>Distance reduction with optimization</p></div>
+            <div class="stat"><h3>15</h3><p>Assets in investment portfolio</p></div>
+            <div class="stat"><h3>12+</h3><p>GitHub repositories</p></div>
+        </div>
+    </div>
+</div>
+
+<section class="section" id="skills">
+    <h2>Technical <span>Skills</span></h2>
+    <div class="skills-grid">
+        <div class="skill-card">
+            <div class="icon">🐍</div>
+            <h3>Python</h3>
+            <p>Pandas, Scikit-learn, PuLP, Folium, Matplotlib</p>
+        </div>
+        <div class="skill-card">
+            <div class="icon">📊</div>
+            <h3>Power BI</h3>
+            <p>DAX, data modeling, interactive dashboards</p>
+        </div>
+        <div class="skill-card">
+            <div class="icon">📈</div>
+            <h3>Excel</h3>
+            <p>Pivot tables, scenario manager, advanced formulas</p>
+        </div>
+        <div class="skill-card">
+            <div class="icon">🤖</div>
+            <h3>Machine Learning</h3>
+            <p>K-Means, XGBoost, Logistic Regression, MLOps</p>
+        </div>
+        <div class="skill-card">
+            <div class="icon">🗄️</div>
+            <h3>SQL</h3>
+            <p>Data querying, aggregations, joins</p>
+        </div>
+        <div class="skill-card">
+            <div class="icon">☁️</div>
+            <h3>Azure ML</h3>
+            <p>End-to-end ML pipelines, model deployment</p>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="projects">
+    <h2>Featured <span>Projects</span></h2>
+    <div class="projects-grid">
+
+        <!-- FinCrece -->
+        <div class="project-card highlight">
+            <span class="tag">⭐ Featured</span>
+            <h3>BI Analysis — Corporación FinCrece</h3>
+            <p>Complete BI analysis for a Colombian microfinance institution: client segmentation with K-Means (k=4), geographic route optimization with PuLP (89.5% distance reduction), risk scenario analysis and interactive Power BI dashboard.</p>
+            <div class="tools">
+                <span class="tool">Python</span>
+                <span class="tool">Power BI</span>
+                <span class="tool">Excel</span>
+                <span class="tool">PuLP</span>
+                <span class="tool">K-Means</span>
+                <span class="tool">Folium</span>
+            </div>
+            <div class="project-links">
+                <a href="fincrece.html" class="project-link">📊 View Full Project</a>
+            </div>
+        </div>
+
+        <!-- Investment Portfolio -->
+        <div class="project-card finance-card">
+            <span class="tag">📈 Quantitative Finance</span>
+            <h3>Investment Portfolio Optimization</h3>
+            <p>Markowitz mean-variance optimization on a 15-asset universe (equities, fixed income, alternatives) with Capital Market Expectations. Ex-ante Sharpe of 1.32 and full out-of-sample backtesting analysis. Co-authored with Ana Luz Rendón González.</p>
+            <div class="tools">
+                <span class="tool">Python</span>
+                <span class="tool">scipy.optimize</span>
+                <span class="tool">Markowitz MVO</span>
+                <span class="tool">Jupyter</span>
+                <span class="tool">yfinance</span>
+            </div>
+            <div class="project-links">
+                <a href="investment-portfolio.html" class="project-link">📈 View Full Project</a>
+                <a href="JUPYTER.html" class="project-link blue" target="_blank">📓 Notebook</a>
+                <a href="1_IPS_ANDRESCERQUERA_ANALUZRENDON.pdf" class="project-link secondary" target="_blank">📄 PDF</a>
+            </div>
+        </div>
+
+        <!-- Corporate Insolvency -->
+        <div class="project-card">
+            <span class="tag">MLOps</span>
+            <h3>Corporate Insolvency Prediction</h3>
+            <p>End-to-end corporate insolvency prediction system using Python and Azure Machine Learning, with automated pipelines and model deployment.</p>
+            <div class="tools">
+                <span class="tool">Python</span>
+                <span class="tool">Azure ML</span>
+                <span class="tool">MLOps</span>
+                <span class="tool">XGBoost</span>
+            </div>
+            <div class="project-links">
+                <a href="https://github.com/andrees-star" class="project-link secondary" target="_blank">View on GitHub</a>
+            </div>
+        </div>
+
+        <!-- TRINITY -->
+        <div class="project-card">
+            <span class="tag">Machine Learning</span>
+            <h3>PROYECTO-TRINITY</h3>
+            <p>Advanced machine learning project with Python — predictive modeling and data analysis.</p>
+            <div class="tools">
+                <span class="tool">Python</span>
+                <span class="tool">Scikit-learn</span>
+                <span class="tool">Pandas</span>
+            </div>
+            <div class="project-links">
+                <a href="https://github.com/andrees-star" class="project-link secondary" target="_blank">View on GitHub</a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- YOUTUBE SECTION -->
+<section class="section" id="youtube">
+    <h2>📺 YouTube <span>Channel</span></h2>
+    <div class="yt-grid">
+
+        <a class="yt-card" href="https://www.youtube.com/watch?v=Db7-zlCy53E" target="_blank" rel="noopener">
+            <div class="yt-thumb">
+                <img src="https://img.youtube.com/vi/Db7-zlCy53E/hqdefault.jpg" alt="Árboles de Regresión" loading="lazy">
+                <div class="yt-play">
+                    <svg viewBox="0 0 68 48" xmlns="http://www.w3.org/2000/svg"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C0 13.05 0 24 0 24s0 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C68 34.95 68 24 68 24s0-10.95-1.48-16.26z" fill="#FF0000"/><path d="M45 24 27 14v20" fill="#fff"/></svg>
+                </div>
+            </div>
+            <div class="yt-info">
+                <span class="yt-tag">🌲 Machine Learning</span>
+                <h4>Árboles de Regresión</h4>
+                <p>Cómo funcionan los árboles de decisión aplicados a problemas de regresión — teoría y práctica en Python.</p>
+            </div>
+        </a>
+
+        <a class="yt-card" href="https://www.youtube.com/watch?v=pdN4iXW65ho" target="_blank" rel="noopener">
+            <div class="yt-thumb">
+                <img src="https://img.youtube.com/vi/pdN4iXW65ho/hqdefault.jpg" alt="Medidas de Desempeño en Regresión" loading="lazy">
+                <div class="yt-play">
+                    <svg viewBox="0 0 68 48" xmlns="http://www.w3.org/2000/svg"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C0 13.05 0 24 0 24s0 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C68 34.95 68 24 68 24s0-10.95-1.48-16.26z" fill="#FF0000"/><path d="M45 24 27 14v20" fill="#fff"/></svg>
+                </div>
+            </div>
+            <div class="yt-info">
+                <span class="yt-tag">📊 Estadística</span>
+                <h4>Medidas de Desempeño en Regresión</h4>
+                <p>MAE, MSE, RMSE, R² — qué mide cada métrica y cuándo usar cuál para evaluar tus modelos.</p>
+            </div>
+        </a>
+
+        <a class="yt-card" href="https://www.youtube.com/watch?v=v0pkdbZ4JAU" target="_blank" rel="noopener">
+            <div class="yt-thumb">
+                <img src="https://img.youtube.com/vi/v0pkdbZ4JAU/hqdefault.jpg" alt="KNN Vecinos más Cercanos" loading="lazy">
+                <div class="yt-play">
+                    <svg viewBox="0 0 68 48" xmlns="http://www.w3.org/2000/svg"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C0 13.05 0 24 0 24s0 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C68 34.95 68 24 68 24s0-10.95-1.48-16.26z" fill="#FF0000"/><path d="M45 24 27 14v20" fill="#fff"/></svg>
+                </div>
+            </div>
+            <div class="yt-info">
+                <span class="yt-tag">🤖 Machine Learning</span>
+                <h4>KNN — Vecinos más Cercanos</h4>
+                <p>Algoritmo K-Nearest Neighbors explicado paso a paso: intuición, hiperparámetro k y aplicación en clasificación.</p>
+            </div>
+        </a>
+
+    </div>
+    <div style="text-align:center; margin-top:2rem;">
+        <a href="https://www.youtube.com/@andres-analytics" class="yt-channel-link" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 68 48" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C0 13.05 0 24 0 24s0 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C68 34.95 68 24 68 24s0-10.95-1.48-16.26z" fill="white"/><path d="M45 24 27 14v20" fill="#FF0000"/></svg>
+            Ver canal completo — @andres-analytics
+        </a>
+    </div>
+</section>
+
+<div class="section" id="contact">
+    <div class="contact">
+        <h2>Get in <span style="color:#58a6ff">Touch</span></h2>
+        <p>Open to new opportunities in BI, Data Analytics and Machine Learning.</p>
+        <div class="contact-links">
+            <a href="https://github.com/andrees-star" class="btn" target="_blank">GitHub</a>
+            <a href="https://www.youtube.com/@andres-analytics" class="btn" style="background:#ff0000;" target="_blank">YouTube</a>
+            <a href="mailto:andresmejia8902@gmail.com" class="btn outline">Email</a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>Built with ❤️ by Andrés Cerquera — andrees-star.github.io</p>
+</footer>
+
+</body>
+</html>
