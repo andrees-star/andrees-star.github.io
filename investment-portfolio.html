@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Portfolio Optimization — Andrés Cerquera</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; }
+
+        nav { background: #161b22; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 100; }
+        nav .logo { font-size: 1.2rem; font-weight: 700; color: #58a6ff; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav ul a { color: #e6edf3; text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+        nav ul a:hover { color: #58a6ff; }
+
+        .hero { padding: 4rem 2rem 3rem; text-align: center; background: linear-gradient(135deg, #161b22 0%, #0d1117 100%); border-bottom: 1px solid #30363d; }
+        .hero .tag { background: #1f6feb33; color: #58a6ff; padding: 0.4rem 1.2rem; border-radius: 20px; font-size: 0.85rem; display: inline-block; margin-bottom: 1.5rem; border: 1px solid #1f6feb66; }
+        .hero h1 { font-size: 2.6rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.2; }
+        .hero h1 span { color: #58a6ff; }
+        .hero .subtitle { font-size: 1.1rem; color: #8b949e; max-width: 680px; margin: 0 auto 1.5rem; line-height: 1.6; }
+        .authors { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+        .author-chip { background: #21262d; border: 1px solid #30363d; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; color: #e6edf3; }
+        .author-chip span { color: #58a6ff; }
+        .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn { background: #238636; color: white; padding: 0.7rem 1.6rem; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background 0.3s; display: inline-block; font-size: 0.9rem; }
+        .btn:hover { background: #2ea043; }
+        .btn.outline { background: transparent; border: 1px solid #30363d; color: #e6edf3; }
+        .btn.outline:hover { background: #21262d; }
+        .btn.blue { background: #1f6feb; }
+        .btn.blue:hover { background: #388bfd; }
+
+        .section { padding: 3.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+        .section h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .section h2 span { color: #58a6ff; }
+        .section-desc { color: #8b949e; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.6; }
+
+        /* Stats grids */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .stat-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.4rem 1rem; text-align: center; }
+        .stat-card.positive { border-color: #238636; }
+        .stat-card.negative { border-color: #da3633; }
+        .stat-card.neutral { border-color: #58a6ff; }
+        .stat-card .val { font-size: 2rem; font-weight: 700; }
+        .stat-card.positive .val { color: #3fb950; }
+        .stat-card.negative .val { color: #f85149; }
+        .stat-card.neutral .val { color: #58a6ff; }
+        .stat-card .lbl { font-size: 0.8rem; color: #8b949e; margin-top: 0.4rem; line-height: 1.4; }
+        .stat-card .sub { font-size: 0.72rem; color: #6e7681; margin-top: 0.2rem; }
+        .phase-label { font-size: 0.75rem; font-weight: 600; color: #8b949e; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+
+        /* Tables */
+        .table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        thead th { background: #161b22; color: #58a6ff; padding: 0.75rem 1rem; text-align: left; border-bottom: 2px solid #30363d; font-weight: 600; white-space: nowrap; }
+        tbody td { padding: 0.65rem 1rem; border-bottom: 1px solid #21262d; color: #e6edf3; }
+        tbody tr:hover { background: #161b2288; }
+        .positive-td { color: #3fb950; font-weight: 600; }
+        .negative-td { color: #f85149; font-weight: 600; }
+        .neutral-td { color: #58a6ff; font-weight: 600; }
+        .pill { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 20px; font-size: 0.75rem; }
+        .pill-eq { background: #1f6feb22; color: #58a6ff; }
+        .pill-fi { background: #23863622; color: #3fb950; }
+        .pill-alt { background: #9e6a0322; color: #d29922; }
+
+        /* Timeline */
+        .timeline { position: relative; padding-left: 2rem; }
+        .timeline::before { content: ''; position: absolute; left: 0.45rem; top: 0; bottom: 0; width: 2px; background: #30363d; }
+        .tl-item { position: relative; margin-bottom: 2rem; }
+        .tl-dot { position: absolute; left: -1.68rem; top: 0.3rem; width: 14px; height: 14px; border-radius: 50%; background: #58a6ff; border: 2px solid #0d1117; }
+        .tl-item h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.3rem; }
+        .tl-item p { font-size: 0.88rem; color: #8b949e; line-height: 1.6; }
+
+        /* Tools */
+        .tools-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
+        .tool { background: #21262d; border: 1px solid #30363d; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.8rem; color: #8b949e; }
+
+        /* Cards */
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+        .card h4 { font-size: 1rem; font-weight: 600; color: #58a6ff; margin-bottom: 0.5rem; }
+        .card p { font-size: 0.88rem; color: #8b949e; line-height: 1.6; }
+
+        /* Conclusions */
+        .conclusion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        .conclusion-item { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.25rem; }
+        .conclusion-item .icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+        .conclusion-item h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+        .conclusion-item p { font-size: 0.85rem; color: #8b949e; line-height: 1.6; }
+
+        footer { text-align: center; padding: 2rem; color: #8b949e; font-size: 0.85rem; border-top: 1px solid #30363d; margin-top: 2rem; }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.9rem; }
+            nav ul { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">andrees-star</div>
+    <ul>
+        <li><a href="index.html">← Portfolio</a></li>
+        <li><a href="#methodology">Methodology</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#oos">Out-of-Sample</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <span class="tag">📈 Quantitative Finance</span>
+    <h1>Investment <span>Portfolio</span> Optimization</h1>
+    <p class="subtitle">Markowitz mean-variance optimization applied to a 15-asset universe of equities, fixed income and alternatives — with Capital Market Expectations and full out-of-sample backtesting.</p>
+    <div class="authors">
+        <span class="author-chip">👨‍💻 <span>Andrés H. Cerquera Mejía</span></span>
+        <span class="author-chip">👩‍💻 <span>Ana Luz Rendón González</span></span>
+    </div>
+    <div class="hero-btns">
+        <a href="https://andrees-star.github.io/JUPYTER.html" class="btn blue" target="_blank">📓 View Notebook</a>
+        <a href="https://andrees-star.github.io/1_IPS_ANDRESCERQUERA_ANALUZRENDON.pdf" class="btn outline" target="_blank">📄 Full Report (PDF)</a>
+        <a href="index.html" class="btn outline">← Back to Portfolio</a>
+    </div>
+</section>
+
+<!-- EX-ANTE PERFORMANCE -->
+<div class="section" id="results">
+    <h2>Ex-Ante <span>Performance</span></h2>
+    <p class="section-desc">Optimized portfolio metrics computed from Capital Market Expectations — forward-looking estimates of return and risk for the selected asset universe.</p>
+    <p class="phase-label">📐 Optimization Phase (Ex-Ante)</p>
+    <div class="stats-row">
+        <div class="stat-card positive">
+            <div class="val">17.89%</div>
+            <div class="lbl">Expected Annual Return</div>
+            <div class="sub">Markowitz optimal</div>
+        </div>
+        <div class="stat-card positive">
+            <div class="val">1.32</div>
+            <div class="lbl">Sharpe Ratio</div>
+            <div class="sub">Risk-adjusted return</div>
+        </div>
+        <div class="stat-card neutral">
+            <div class="val">15</div>
+            <div class="lbl">Assets in Portfolio</div>
+            <div class="sub">Equities, FI & Alts</div>
+        </div>
+        <div class="stat-card neutral">
+            <div class="val">3</div>
+            <div class="lbl">Asset Classes</div>
+            <div class="sub">Diversified universe</div>
+        </div>
+    </div>
+</div>
+
+<!-- BENCHMARK vs ACTIVE -->
+<div class="section">
+    <h2>Benchmark vs. <span>Active Portfolio</span></h2>
+    <p class="section-desc">Comparison of the optimized active portfolio against the 60/40 benchmark using Capital Market Expectations.</p>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>60/40 Benchmark</th>
+                    <th>Active Portfolio</th>
+                    <th>Difference</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Expected Return (Ann.)</td>
+                    <td>~8–10%</td>
+                    <td class="positive-td">17.89%</td>
+                    <td class="positive-td">+7–9 pp</td>
+                </tr>
+                <tr>
+                    <td>Sharpe Ratio</td>
+                    <td>~0.5–0.7</td>
+                    <td class="positive-td">1.32</td>
+                    <td class="positive-td">+0.6–0.8</td>
+                </tr>
+                <tr>
+                    <td>Portfolio Strategy</td>
+                    <td>Passive allocation</td>
+                    <td class="neutral-td">Markowitz optimal</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>Asset Universe</td>
+                    <td>2 assets (SPY / AGG)</td>
+                    <td class="neutral-td">15 assets</td>
+                    <td class="positive-td">13 additional</td>
+                </tr>
+                <tr>
+                    <td>Rebalancing</td>
+                    <td>Static 60/40</td>
+                    <td>Optimization-based</td>
+                    <td>—</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- PORTFOLIO COMPOSITION -->
+<div class="section">
+    <h2>Portfolio <span>Composition</span></h2>
+    <p class="section-desc">The 15-asset universe spans large-cap equities, investment-grade fixed income, inflation-protected bonds, and municipal bonds — selected for diversification across economic sectors and risk factors.</p>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Name / Description</th>
+                    <th>Class</th>
+                    <th>Sector</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="neutral-td">AVGO</td><td>Broadcom Inc.</td><td><span class="pill pill-eq">Equity</span></td><td>Semiconductors</td></tr>
+                <tr><td class="neutral-td">NVDA</td><td>NVIDIA Corporation</td><td><span class="pill pill-eq">Equity</span></td><td>Semiconductors / AI</td></tr>
+                <tr><td class="neutral-td">COST</td><td>Costco Wholesale</td><td><span class="pill pill-eq">Equity</span></td><td>Consumer Staples</td></tr>
+                <tr><td class="neutral-td">LLY</td><td>Eli Lilly & Co.</td><td><span class="pill pill-eq">Equity</span></td><td>Healthcare / Pharma</td></tr>
+                <tr><td class="neutral-td">UNH</td><td>UnitedHealth Group</td><td><span class="pill pill-eq">Equity</span></td><td>Healthcare / Insurance</td></tr>
+                <tr><td class="neutral-td">AAPL</td><td>Apple Inc.</td><td><span class="pill pill-eq">Equity</span></td><td>Technology</td></tr>
+                <tr><td class="neutral-td">AMZN</td><td>Amazon.com Inc.</td><td><span class="pill pill-eq">Equity</span></td><td>Technology / Retail</td></tr>
+                <tr><td class="neutral-td">MMC</td><td>Marsh & McLennan</td><td><span class="pill pill-eq">Equity</span></td><td>Financial Services</td></tr>
+                <tr><td class="neutral-td">BKNG</td><td>Booking Holdings</td><td><span class="pill pill-eq">Equity</span></td><td>Travel / Leisure</td></tr>
+                <tr><td class="neutral-td">SHY</td><td>iShares 1–3Y Treasury ETF</td><td><span class="pill pill-fi">Fixed Income</span></td><td>Short Duration Gov</td></tr>
+                <tr><td class="neutral-td">IEF</td><td>iShares 7–10Y Treasury ETF</td><td><span class="pill pill-fi">Fixed Income</span></td><td>Intermediate Gov</td></tr>
+                <tr><td class="neutral-td">TLT</td><td>iShares 20+ Year Treasury ETF</td><td><span class="pill pill-fi">Fixed Income</span></td><td>Long Duration Gov</td></tr>
+                <tr><td class="neutral-td">VCIT</td><td>Vanguard Corp Bond ETF</td><td><span class="pill pill-fi">Fixed Income</span></td><td>Investment Grade Corp</td></tr>
+                <tr><td class="neutral-td">TIP</td><td>iShares TIPS Bond ETF</td><td><span class="pill pill-fi">Fixed Income</span></td><td>Inflation-Protected</td></tr>
+                <tr><td class="neutral-td">MUB</td><td>iShares National Muni ETF</td><td><span class="pill pill-fi">Fixed Income</span></td><td>Municipal Bonds</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- OUT-OF-SAMPLE -->
+<div class="section" id="oos">
+    <h2>Out-of-Sample <span>Analysis</span></h2>
+    <p class="section-desc">The portfolio was tested against realized market data beyond the estimation window. The out-of-sample period coincided with a broad equity market correction, stress-testing the optimization assumptions.</p>
+    <p class="phase-label">📊 Backtesting Phase (Realized Returns)</p>
+    <div class="stats-row">
+        <div class="stat-card negative">
+            <div class="val">−7.61%</div>
+            <div class="lbl">Annualized Return</div>
+            <div class="sub">Realized out-of-sample</div>
+        </div>
+        <div class="stat-card negative">
+            <div class="val">−1.38</div>
+            <div class="lbl">Sharpe Ratio</div>
+            <div class="sub">Risk-adjusted realized</div>
+        </div>
+        <div class="stat-card negative">
+            <div class="val">−7.04%</div>
+            <div class="lbl">Maximum Drawdown</div>
+            <div class="sub">Peak-to-trough loss</div>
+        </div>
+        <div class="stat-card neutral">
+            <div class="val">17.89%</div>
+            <div class="lbl">vs. Ex-Ante Target</div>
+            <div class="sub">Estimation-period forecast</div>
+        </div>
+    </div>
+
+    <div style="margin-top:1.5rem;">
+        <div class="card">
+            <h4>📉 Key Observations</h4>
+            <p>The gap between ex-ante (+17.89%) and realized (−7.61%) performance highlights the inherent challenge of Capital Market Expectations estimation. The out-of-sample period captured a market regime with elevated interest rate volatility and sector rotation, particularly affecting the equity growth components (AVGO, NVDA, AAPL) that drove the optimization's high ex-ante forecast. Fixed-income holdings (TLT, IEF) also experienced mark-to-market losses during the rising-rate environment.</p>
+        </div>
+        <div class="card">
+            <h4>🔬 Methodology Limitation</h4>
+            <p>Markowitz optimization is highly sensitive to return estimates. Small errors in expected return inputs can produce dramatically different realized outcomes — a well-documented phenomenon in the literature (Michaud, 1989). This project explicitly demonstrates this limitation as a learning objective, making the out-of-sample analysis the most pedagogically valuable section of the work.</p>
+        </div>
+    </div>
+</div>
+
+<!-- METHODOLOGY -->
+<div class="section" id="methodology">
+    <h2>Project <span>Methodology</span></h2>
+    <p class="section-desc">A structured, five-phase approach from universe definition to performance attribution.</p>
+    <div class="timeline">
+        <div class="tl-item">
+            <div class="tl-dot"></div>
+            <h4>Phase 1 — Asset Universe Definition</h4>
+            <p>Selected 15 assets across three classes (equities, fixed income, alternatives) balancing sector diversification, liquidity and data availability. Asset selection criteria included market capitalization, correlation properties and sector coverage.</p>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot"></div>
+            <h4>Phase 2 — Capital Market Expectations (CME)</h4>
+            <p>Forward-looking return estimates built using an analyst-consensus and factor-based approach. Covariance matrix estimated from historical data with shrinkage to reduce estimation error. Risk-free rate calibrated to prevailing short-term Treasury yields.</p>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot"></div>
+            <h4>Phase 3 — Mean-Variance Optimization</h4>
+            <p>Markowitz (1952) framework implemented in Python (scipy.optimize). Efficient frontier mapped across the risk-return space. Optimal portfolio selected as the tangency portfolio (maximum Sharpe ratio). Constraints: long-only, full investment, per-asset weight caps.</p>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot"></div>
+            <h4>Phase 4 — Investment Policy Statement</h4>
+            <p>Formal IPS documentation defining investor objectives, risk tolerance, liquidity needs, time horizon and constraints — following CFA Institute standards. The IPS guided constraint calibration in the optimization step.</p>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot"></div>
+            <h4>Phase 5 — Out-of-Sample Backtesting</h4>
+            <p>Portfolio weights applied to a hold-out period with realized market data. Performance attribution disaggregated by asset class and individual security. Sharpe, Sortino, maximum drawdown and annualized return computed and compared to the ex-ante forecasts.</p>
+        </div>
+    </div>
+</div>
+
+<!-- CONCLUSIONS -->
+<div class="section">
+    <h2>Key <span>Conclusions</span></h2>
+    <p class="section-desc">What this project demonstrates and teaches about modern portfolio management.</p>
+    <div class="conclusion-grid">
+        <div class="conclusion-item">
+            <div class="icon">⚠️</div>
+            <h4>Estimation Risk is Real</h4>
+            <p>The 25.5 percentage-point return gap between ex-ante and realized demonstrates that CME accuracy is the binding constraint in Markowitz optimization — not the math itself.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">🛡️</div>
+            <h4>Diversification Provides Partial Protection</h4>
+            <p>The −7.04% max drawdown, while negative, was contained relative to individual equity drawdowns during the same period, confirming the diversification benefit of multi-asset portfolios.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">📐</div>
+            <h4>Optimization Framework is Sound</h4>
+            <p>Given accurate inputs, Markowitz MVO produces well-constructed, efficient portfolios. The framework's sensitivity to inputs motivates robust estimation techniques (Black-Litterman, resampling).</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">📚</div>
+            <h4>IPS Disciplines the Process</h4>
+            <p>Formalizing investor constraints in an Investment Policy Statement before optimization prevents unconstrained solutions that are theoretically optimal but practically unimplementable.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">🔄</div>
+            <h4>Regime Sensitivity</h4>
+            <p>The out-of-sample period captured a rate-hike cycle that invalidated the expected correlation structure between equities and bonds — a reminder that historical correlations are non-stationary.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">🚀</div>
+            <h4>Extensions Identified</h4>
+            <p>Future work: Black-Litterman model to blend views with priors, resampled efficiency (Michaud), dynamic rebalancing triggers, and factor decomposition of active return vs. benchmark.</p>
+        </div>
+    </div>
+    <div class="tools-row">
+        <span class="tool">Python</span>
+        <span class="tool">scipy.optimize</span>
+        <span class="tool">NumPy</span>
+        <span class="tool">Pandas</span>
+        <span class="tool">Matplotlib</span>
+        <span class="tool">yfinance</span>
+        <span class="tool">Jupyter Notebook</span>
+        <span class="tool">Markowitz MVO</span>
+        <span class="tool">CFA Framework</span>
+    </div>
+</div>
+
+<!-- RESOURCES -->
+<div class="section">
+    <h2>Project <span>Resources</span></h2>
+    <p class="section-desc">Full analysis available as an interactive notebook and a formal PDF report.</p>
+    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a href="https://andrees-star.github.io/JUPYTER.html" class="btn blue" target="_blank">📓 Interactive Notebook (HTML)</a>
+        <a href="https://andrees-star.github.io/1_IPS_ANDRESCERQUERA_ANALUZRENDON.pdf" class="btn outline" target="_blank">📄 Investment Policy Statement (PDF)</a>
+        <a href="index.html" class="btn outline">← Back to Portfolio</a>
+    </div>
+</div>
+
+<footer>
+    <p>Built by Andrés H. Cerquera Mejía & Ana Luz Rendón González — <a href="https://andrees-star.github.io" style="color:#58a6ff; text-decoration:none;">andrees-star.github.io</a></p>
+</footer>
+
+</body>
+</html>

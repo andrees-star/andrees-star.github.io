@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BI Analysis — Corporación FinCrece | Andrés Cerquera</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; }
+
+        nav { background: #161b22; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 100; }
+        nav .logo { font-size: 1.2rem; font-weight: 700; color: #58a6ff; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav ul a { color: #e6edf3; text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+        nav ul a:hover { color: #58a6ff; }
+
+        .hero { padding: 4rem 2rem 3rem; text-align: center; background: linear-gradient(135deg, #161b22 0%, #0d1117 100%); border-bottom: 1px solid #30363d; }
+        .hero .tag { background: #23863622; color: #3fb950; padding: 0.4rem 1.2rem; border-radius: 20px; font-size: 0.85rem; display: inline-block; margin-bottom: 1.5rem; border: 1px solid #23863666; }
+        .hero h1 { font-size: 2.6rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.2; }
+        .hero h1 span { color: #58a6ff; }
+        .hero .subtitle { font-size: 1.1rem; color: #8b949e; max-width: 680px; margin: 0 auto 1.5rem; line-height: 1.6; }
+        .author-chip { background: #21262d; border: 1px solid #30363d; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; color: #58a6ff; display: inline-block; margin-bottom: 2rem; }
+        .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn { background: #238636; color: white; padding: 0.7rem 1.6rem; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background 0.3s; display: inline-block; font-size: 0.9rem; }
+        .btn:hover { background: #2ea043; }
+        .btn.outline { background: transparent; border: 1px solid #30363d; color: #e6edf3; }
+        .btn.outline:hover { background: #21262d; }
+
+        .section { padding: 3.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+        .section h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .section h2 span { color: #58a6ff; }
+        .section-desc { color: #8b949e; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.6; }
+
+        /* Stats */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.4rem 1rem; text-align: center; }
+        .stat-card.green { border-color: #238636; }
+        .stat-card.blue { border-color: #1f6feb; }
+        .stat-card.orange { border-color: #9e6a03; }
+        .stat-card .val { font-size: 2rem; font-weight: 700; }
+        .stat-card.green .val { color: #3fb950; }
+        .stat-card.blue .val { color: #58a6ff; }
+        .stat-card.orange .val { color: #d29922; }
+        .stat-card .lbl { font-size: 0.8rem; color: #8b949e; margin-top: 0.4rem; line-height: 1.4; }
+
+        /* Segment cards */
+        .segments-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+        .seg-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.25rem; }
+        .seg-card .seg-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+        .seg-card .seg-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+        .seg-dot-0 { background: #58a6ff; }
+        .seg-dot-1 { background: #3fb950; }
+        .seg-dot-2 { background: #d29922; }
+        .seg-dot-3 { background: #f85149; }
+        .seg-card h4 { font-size: 0.95rem; font-weight: 700; }
+        .seg-card .seg-label { font-size: 0.78rem; color: #8b949e; margin-top: 0.1rem; }
+        .seg-card p { font-size: 0.85rem; color: #8b949e; line-height: 1.6; }
+        .seg-badge { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 20px; font-size: 0.72rem; margin-top: 0.6rem; }
+        .badge-low { background: #23863622; color: #3fb950; }
+        .badge-mid { background: #1f6feb22; color: #58a6ff; }
+        .badge-high { background: #9e6a0322; color: #d29922; }
+        .badge-risk { background: #da363322; color: #f85149; }
+
+        /* Timeline */
+        .timeline { position: relative; padding-left: 2rem; }
+        .timeline::before { content: ''; position: absolute; left: 0.45rem; top: 0; bottom: 0; width: 2px; background: #30363d; }
+        .tl-item { position: relative; margin-bottom: 2rem; }
+        .tl-dot { position: absolute; left: -1.68rem; top: 0.3rem; width: 14px; height: 14px; border-radius: 50%; background: #58a6ff; border: 2px solid #0d1117; }
+        .tl-item h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.3rem; }
+        .tl-item p { font-size: 0.88rem; color: #8b949e; line-height: 1.6; }
+
+        /* Tables */
+        .table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        thead th { background: #161b22; color: #58a6ff; padding: 0.75rem 1rem; text-align: left; border-bottom: 2px solid #30363d; font-weight: 600; white-space: nowrap; }
+        tbody td { padding: 0.65rem 1rem; border-bottom: 1px solid #21262d; color: #e6edf3; }
+        tbody tr:hover { background: #161b2288; }
+        .green-td { color: #3fb950; font-weight: 600; }
+        .blue-td { color: #58a6ff; font-weight: 600; }
+        .orange-td { color: #d29922; font-weight: 600; }
+        .red-td { color: #f85149; font-weight: 600; }
+
+        /* Tools */
+        .tools-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
+        .tool { background: #21262d; border: 1px solid #30363d; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.8rem; color: #8b949e; }
+
+        /* Cards */
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+        .card h4 { font-size: 1rem; font-weight: 600; color: #58a6ff; margin-bottom: 0.5rem; }
+        .card p { font-size: 0.88rem; color: #8b949e; line-height: 1.6; }
+
+        /* Conclusions */
+        .conclusion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        .conclusion-item { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.25rem; }
+        .conclusion-item .icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+        .conclusion-item h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+        .conclusion-item p { font-size: 0.85rem; color: #8b949e; line-height: 1.6; }
+
+        /* City comparison */
+        .city-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 700px) { .city-grid { grid-template-columns: 1fr; } }
+        .city-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.25rem; }
+        .city-card h4 { font-size: 1rem; font-weight: 700; color: #58a6ff; margin-bottom: 0.3rem; }
+        .city-card .city-meta { font-size: 0.78rem; color: #8b949e; margin-bottom: 1rem; }
+
+        footer { text-align: center; padding: 2rem; color: #8b949e; font-size: 0.85rem; border-top: 1px solid #30363d; margin-top: 2rem; }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.9rem; }
+            nav ul { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">andrees-star</div>
+    <ul>
+        <li><a href="index.html">← Portfolio</a></li>
+        <li><a href="#segmentation">Segmentation</a></li>
+        <li><a href="#optimization">Optimization</a></li>
+        <li><a href="#dashboard">Dashboard</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <span class="tag">⭐ Featured Project</span>
+    <h1>BI Analysis — <span>Corporación FinCrece</span></h1>
+    <p class="subtitle">End-to-end Business Intelligence project for a Colombian microfinance institution: client segmentation with K-Means, geographic route optimization with linear programming, and an interactive Power BI dashboard.</p>
+    <div class="author-chip">👨‍💻 Andrés H. Cerquera Mejía</div>
+    <div class="hero-btns">
+        <a href="https://github.com/andrees-star" class="btn" target="_blank">View on GitHub</a>
+        <a href="index.html" class="btn outline">← Back to Portfolio</a>
+    </div>
+</section>
+
+<!-- KEY METRICS -->
+<div class="section">
+    <h2>Project <span>Highlights</span></h2>
+    <p class="section-desc">Three analytical components — unsupervised learning, operations research, and business intelligence — integrated into a single decision-support system for FinCrece's management team.</p>
+    <div class="stats-row">
+        <div class="stat-card green">
+            <div class="val">320</div>
+            <div class="lbl">Clients Analyzed</div>
+        </div>
+        <div class="stat-card green">
+            <div class="val">4</div>
+            <div class="lbl">Client Segments (K-Means)</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="val">89.5%</div>
+            <div class="lbl">Route Distance Reduction</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="val">3</div>
+            <div class="lbl">Cities Covered</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="val">2</div>
+            <div class="lbl">Risk Scenarios Modeled</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="val">5+</div>
+            <div class="lbl">Dashboard Report Pages</div>
+        </div>
+    </div>
+</div>
+
+<!-- SEGMENTATION -->
+<div class="section" id="segmentation">
+    <h2>Client <span>Segmentation</span></h2>
+    <p class="section-desc">K-Means clustering (k=4) applied to FinCrece's full client base, identifying four behaviorally distinct segments across portfolio size, delinquency rate, product type and sector exposure. Optimal k selected via elbow method and silhouette analysis.</p>
+
+    <div class="segments-grid">
+        <div class="seg-card">
+            <div class="seg-header">
+                <div class="seg-dot seg-dot-0"></div>
+                <div>
+                    <h4>Segment 1 — Base Standard</h4>
+                    <div class="seg-label">Low portfolio, active clients</div>
+                </div>
+            </div>
+            <p>Clients with small individual balances and regular payment behavior. Predominantly <em>Microcrédito Individual</em> and <em>Crédito Grupal Solidario</em> in the Comercio and Alimentos sectors. Zero mora rate — lowest-risk segment.</p>
+            <span class="seg-badge badge-low">⬤ Low Risk</span>
+        </div>
+        <div class="seg-card">
+            <div class="seg-header">
+                <div class="seg-dot seg-dot-1"></div>
+                <div>
+                    <h4>Segment 2 — Low Risk</h4>
+                    <div class="seg-label">Mid portfolio, clean history</div>
+                </div>
+            </div>
+            <p>Mid-range portfolio clients with demonstrated repayment capacity. Mix of <em>Crédito Rotativo</em> (Manufactura, Agroindustria) and <em>Línea Emprendimiento</em> (Servicios). Positioned for credit line expansion.</p>
+            <span class="seg-badge badge-low">⬤ Low Risk</span>
+        </div>
+        <div class="seg-card">
+            <div class="seg-header">
+                <div class="seg-dot seg-dot-2"></div>
+                <div>
+                    <h4>Segment 3 — Mid Risk</h4>
+                    <div class="seg-label">Moderate mora, watch list</div>
+                </div>
+            </div>
+            <p>Clients showing early delinquency signals. Includes <em>Línea Emprendimiento</em> (Agroindustria) with mora rates near 7.9% and <em>Microcrédito Individual</em> (Servicios) approaching 31%. Requires proactive contact strategy.</p>
+            <span class="seg-badge badge-mid">⬤ Mid Risk</span>
+        </div>
+        <div class="seg-card">
+            <div class="seg-header">
+                <div class="seg-dot seg-dot-3"></div>
+                <div>
+                    <h4>Segment 4 — High Risk</h4>
+                    <div class="seg-label">Critical mora, immediate action</div>
+                </div>
+            </div>
+            <p>Clients with mora rates reaching 100% (e.g. <em>Crédito Rotativo — Agroindustria</em> in Rionegro: full balance in default). Concentrated in specific product-sector combinations. Priority for provisioning and recovery campaigns.</p>
+            <span class="seg-badge badge-risk">⬤ High Risk</span>
+        </div>
+    </div>
+
+    <!-- Segmentation detail table -->
+    <div class="table-wrap">
+        <p style="font-size:0.8rem; color:#8b949e; margin-bottom:0.75rem; margin-top:1.5rem;">▼ Sample segmentation output — RIONEGRO (all segments)</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Sector</th>
+                    <th>Clients</th>
+                    <th>Portfolio (COP)</th>
+                    <th>Mora (COP)</th>
+                    <th>Mora Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Línea Emprendimiento</td><td>Manufactura</td><td>2</td><td>7,334,468</td><td>0</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Línea Emprendimiento</td><td>Agroindustria</td><td>4</td><td>6,764,938</td><td>531,163</td><td class="orange-td">7.85%</td></tr>
+                <tr><td>Crédito Rotativo</td><td>Manufactura</td><td>3</td><td>4,261,599</td><td>0</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Crédito Grupal Solidario</td><td>Servicios</td><td>3</td><td>4,121,990</td><td>0</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Línea Emprendimiento</td><td>Comercio</td><td>2</td><td>3,299,973</td><td>0</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Microcrédito Individual</td><td>Servicios</td><td>3</td><td>2,514,181</td><td>778,816</td><td class="red-td">30.98%</td></tr>
+                <tr><td>Crédito Rotativo</td><td>Comercio</td><td>2</td><td>2,115,870</td><td>0</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Microcrédito Individual</td><td>Alimentos</td><td>3</td><td>1,857,807</td><td>0</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Crédito Grupal Solidario</td><td>Manufactura</td><td>1</td><td>1,662,150</td><td>0</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Microcrédito Individual</td><td>Manufactura</td><td>2</td><td>1,441,633</td><td>0</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Crédito Rotativo</td><td>Agroindustria</td><td>1</td><td>667,962</td><td>667,962</td><td class="red-td">100.00%</td></tr>
+                <tr><td>Microcrédito Individual</td><td>Agroindustria</td><td>1</td><td>421,228</td><td>0</td><td class="green-td">0.00%</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-wrap">
+        <p style="font-size:0.8rem; color:#8b949e; margin-bottom:0.75rem; margin-top:1.5rem;">▼ CALI — Low Risk &amp; Base Standard segments only</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Sector</th>
+                    <th>Clients</th>
+                    <th>Portfolio (COP)</th>
+                    <th>Mora Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Crédito Rotativo</td><td>Manufactura</td><td>2</td><td>2,612,087</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Crédito Rotativo</td><td>Agroindustria</td><td>2</td><td>2,518,888</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Crédito Rotativo</td><td>Comercio</td><td>3</td><td>2,183,634</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Microcrédito Individual</td><td>Comercio</td><td>2</td><td>1,946,159</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Crédito Rotativo</td><td>Alimentos</td><td>1</td><td>1,468,409</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Línea Emprendimiento</td><td>Servicios</td><td>2</td><td>1,398,492</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Microcrédito Individual</td><td>Alimentos</td><td>2</td><td>1,270,337</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Crédito Grupal Solidario</td><td>Alimentos</td><td>3</td><td>1,055,118</td><td class="green-td">0.00%</td></tr>
+                <tr><td>Línea Emprendimiento</td><td>Alimentos</td><td>2</td><td>1,014,541</td><td class="green-td">0.00%</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- OPTIMIZATION -->
+<div class="section" id="optimization">
+    <h2>Geographic <span>Optimization</span></h2>
+    <p class="section-desc">PuLP (Linear Programming) applied to advisor routing across FinCrece's client locations, modeled as a variant of the Vehicle Routing Problem. Objective: minimize total travel distance while respecting daily visit capacity constraints per advisor.</p>
+    <div class="stats-row">
+        <div class="stat-card green">
+            <div class="val">89.5%</div>
+            <div class="lbl">Distance reduction vs. unoptimized routes</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="val">PuLP</div>
+            <div class="lbl">Python LP solver used</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="val">Folium</div>
+            <div class="lbl">Interactive map visualization</div>
+        </div>
+    </div>
+    <div class="card">
+        <h4>🗺️ How the Optimization Works</h4>
+        <p>Client coordinates were geocoded from their registered addresses across FinCrece's three operating cities. PuLP formulated a Mixed-Integer Linear Program: binary decision variables for each advisor-client assignment, with constraints on daily capacity, single-assignment (each client belongs to exactly one route), and return-to-base. The solver minimized haversine distance across all assigned routes. Optimized routes were rendered on interactive Folium maps, giving field supervisors a visual tool for planning daily visits.</p>
+    </div>
+    <div class="card">
+        <h4>📉 Impact</h4>
+        <p>The unoptimized baseline — advisors visiting clients in sequential list order — generated unnecessary cross-city backtracking. Post-optimization routes cluster clients geographically, reducing total daily distance by 89.5%. For FinCrece's fleet of field advisors, this translates directly into fuel savings, more client visits per day, and reduced advisor fatigue — with no additional headcount required.</p>
+    </div>
+</div>
+
+<!-- METHODOLOGY -->
+<div class="section">
+    <h2>Project <span>Methodology</span></h2>
+    <p class="section-desc">A four-phase pipeline from raw microfinance data to actionable strategic output.</p>
+    <div class="timeline">
+        <div class="tl-item">
+            <div class="tl-dot"></div>
+            <h4>Phase 1 — Data Extraction & Cleaning</h4>
+            <p>Raw client data extracted from FinCrece's core banking system. Pandas pipeline: duplicate removal, missing value imputation, currency normalization (COP), date standardization. Multi-index aggregation by city → product → sector for portfolio-level reporting.</p>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot"></div>
+            <h4>Phase 2 — Client Segmentation (K-Means)</h4>
+            <p>Feature engineering: portfolio balance per client, mora rate, credit product type (encoded), sector (encoded), days overdue. StandardScaler normalization. Elbow method + silhouette score converged on k=4. Segment profiles validated against FinCrece's credit risk taxonomy (Base Standard, Low Risk, Mid Risk, High Risk).</p>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot"></div>
+            <h4>Phase 3 — Geographic Optimization (PuLP)</h4>
+            <p>Client geocoding via address → coordinates lookup. PuLP Mixed-Integer Linear Program built per city. Decision variables: binary assignment of client j to advisor i. Constraints: capacity (max visits/day), coverage (all clients assigned), return-to-base. Solver: CBC (COIN-OR). Output routes rendered with Folium.</p>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot"></div>
+            <h4>Phase 4 — Risk Scenario Analysis & Power BI Dashboard</h4>
+            <p>Two macro scenarios modeled: Base Case (stable) and Stress (economic contraction, +15% mora rates). Key metrics computed per segment under each scenario: expected provision, coverage ratio, adjusted portfolio yield. Full 5-page interactive Power BI dashboard built: portfolio overview, segment deep-dive, geographic heatmap, scenario comparison, executive summary.</p>
+        </div>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="section" id="dashboard">
+    <h2>Power BI <span>Dashboard</span></h2>
+    <p class="section-desc">The analytical outputs were packaged into a multi-page interactive dashboard for FinCrece's management team — designed for non-technical stakeholders to explore segmentation results, track KPIs and simulate risk scenarios.</p>
+    <div class="conclusion-grid">
+        <div class="conclusion-item">
+            <div class="icon">📊</div>
+            <h4>Page 1 — Portfolio Overview</h4>
+            <p>Total portfolio balance, client count, mora rate and concentration by city. Drill-through from aggregate to product and sector level.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">🎯</div>
+            <h4>Page 2 — Segment Deep-Dive</h4>
+            <p>K-Means segment profiles visualized: radar charts per segment, balance distribution, mora heatmap by product × sector grid.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">🗺️</div>
+            <h4>Page 3 — Geographic View</h4>
+            <p>City-level portfolio and mora heatmap. Embedded Folium map outputs showing optimized advisor routes per city.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">⚠️</div>
+            <h4>Page 4 — Scenario Analysis</h4>
+            <p>Base vs. Stress scenario comparison: side-by-side KPIs, projected provision requirements, coverage ratio sensitivity by segment.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">📋</div>
+            <h4>Page 5 — Executive Summary</h4>
+            <p>One-page strategic narrative: top 3 risks, top 3 opportunities, recommended actions by segment, route optimization ROI estimate.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">🔄</div>
+            <h4>Interactive Filters</h4>
+            <p>Cross-filtering by city, product, sector and segment. Date range slicer. Conditional formatting: red/yellow/green mora rate thresholds per segment.</p>
+        </div>
+    </div>
+</div>
+
+<!-- CONCLUSIONS -->
+<div class="section">
+    <h2>Key <span>Conclusions</span></h2>
+    <p class="section-desc">Strategic takeaways delivered to FinCrece's management team.</p>
+    <div class="conclusion-grid">
+        <div class="conclusion-item">
+            <div class="icon">🔍</div>
+            <h4>Concentration Risk Identified</h4>
+            <p>Crédito Rotativo in Agroindustria (Rionegro) shows 100% mora rate — a single product-sector cell representing a material provision requirement relative to its balance.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">📈</div>
+            <h4>Growth Opportunity in Base Segment</h4>
+            <p>Cali's Base Standard and Low Risk segments show zero mora across all products — ideal candidates for upselling Línea Emprendimiento or increasing Crédito Rotativo limits.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">🚗</div>
+            <h4>Field Efficiency Gain</h4>
+            <p>89.5% route distance reduction translates to an estimated 2–3 additional client visits per advisor per day — significant capacity gain without new hires.</p>
+        </div>
+        <div class="conclusion-item">
+            <div class="icon">⚡</div>
+            <h4>Early Warning System</h4>
+            <p>Microcrédito Individual (Servicios) in Rionegro at 31% mora signals sector stress — proactive restructuring outreach recommended before reaching provisioning thresholds.</p>
+        </div>
+    </div>
+    <div class="tools-row">
+        <span class="tool">Python</span>
+        <span class="tool">Pandas</span>
+        <span class="tool">Scikit-learn (K-Means)</span>
+        <span class="tool">PuLP</span>
+        <span class="tool">Folium</span>
+        <span class="tool">Matplotlib</span>
+        <span class="tool">Power BI</span>
+        <span class="tool">DAX</span>
+        <span class="tool">Excel</span>
+    </div>
+</div>
+
+<!-- RESOURCES -->
+<div class="section">
+    <h2>Project <span>Resources</span></h2>
+    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a href="https://github.com/andrees-star" class="btn" target="_blank">View on GitHub</a>
+        <a href="index.html" class="btn outline">← Back to Portfolio</a>
+    </div>
+</div>
+
+<footer>
+    <p>Built by Andrés H. Cerquera Mejía — <a href="https://andrees-star.github.io" style="color:#58a6ff; text-decoration:none;">andrees-star.github.io</a></p>
+</footer>
+
+</body>
+</html>
