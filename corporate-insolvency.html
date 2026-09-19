@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Insolvency MLOps — Andrés Cerquera</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; }
+
+        nav { background: #161b22; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 100; }
+        nav .logo { font-size: 1.2rem; font-weight: 700; color: #58a6ff; text-decoration: none; }
+        nav .back { color: #8b949e; text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+        nav .back:hover { color: #58a6ff; }
+
+        .hero { padding: 4rem 2rem; background: linear-gradient(135deg, #161b22 0%, #0d1117 100%); border-bottom: 1px solid #30363d; text-align: center; }
+        .hero .tag { background: #1f6feb33; color: #58a6ff; border: 1px solid #1f6feb66; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.8rem; display: inline-block; margin-bottom: 1.5rem; }
+        .hero h1 { font-size: 2.4rem; font-weight: 700; line-height: 1.3; margin-bottom: 1rem; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .hero h1 span { color: #58a6ff; }
+        .hero .meta { color: #8b949e; font-size: 0.95rem; margin-bottom: 0.5rem; }
+        .hero .meta strong { color: #e6edf3; }
+        .hero-links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem; }
+        .btn { padding: 0.6rem 1.4rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: #238636; color: white; }
+        .btn-primary:hover { background: #2ea043; }
+        .btn-outline { background: transparent; border: 1px solid #30363d; color: #e6edf3; }
+        .btn-outline:hover { background: #21262d; border-color: #58a6ff; }
+        .btn-blue { background: #1f6feb; color: white; }
+        .btn-blue:hover { background: #388bfd; }
+
+        .section { padding: 3.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+        .section-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 2rem; padding-bottom: 0.75rem; border-bottom: 1px solid #30363d; }
+        .section-title span { color: #58a6ff; }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+        .stat-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; text-align: center; }
+        .stat-card .num { font-size: 2.2rem; font-weight: 700; color: #58a6ff; line-height: 1; margin-bottom: 0.5rem; }
+        .stat-card .label { font-size: 0.82rem; color: #8b949e; line-height: 1.4; }
+
+        /* Context */
+        .context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 700px) { .context-grid { grid-template-columns: 1fr; } }
+        .info-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; }
+        .info-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: #58a6ff; }
+        .info-card p, .info-card li { font-size: 0.9rem; color: #8b949e; line-height: 1.7; }
+        .info-card ul { padding-left: 1.2rem; }
+        .info-card li { margin-bottom: 0.3rem; }
+
+        /* Dataset */
+        .dataset-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .dataset-table th { background: #21262d; color: #58a6ff; padding: 0.75rem 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid #30363d; }
+        .dataset-table td { padding: 0.65rem 1rem; border-bottom: 1px solid #21262d; color: #e6edf3; }
+        .dataset-table tr:hover td { background: #21262d; }
+        .badge-insolvent { background: #da3633; color: white; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+        .badge-solvent { background: #238636; color: white; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+
+        /* Results tables */
+        .horizon-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        @media (max-width: 800px) { .horizon-wrapper { grid-template-columns: 1fr; } }
+        .horizon-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; }
+        .horizon-header { background: #21262d; padding: 1rem 1.5rem; border-bottom: 1px solid #30363d; }
+        .horizon-header h3 { font-size: 1rem; font-weight: 700; color: #e6edf3; }
+        .horizon-header p { font-size: 0.8rem; color: #8b949e; margin-top: 0.2rem; }
+        .results-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .results-table th { background: #161b22; color: #8b949e; padding: 0.6rem 0.8rem; text-align: center; font-weight: 600; border-bottom: 1px solid #30363d; font-size: 0.78rem; }
+        .results-table th:first-child { text-align: left; }
+        .results-table td { padding: 0.6rem 0.8rem; border-bottom: 1px solid #21262d; text-align: center; }
+        .results-table td:first-child { text-align: left; font-weight: 600; color: #e6edf3; }
+        .results-table tr.winner td { background: #1f6feb11; }
+        .results-table tr.winner td:first-child { color: #58a6ff; }
+        .metric-good { color: #3fb950; }
+        .metric-mid { color: #d29922; }
+        .metric-bad { color: #f85149; }
+        .crown { font-size: 0.8rem; margin-left: 0.3rem; }
+
+        /* Architecture */
+        .pipeline { display: flex; flex-direction: column; gap: 0; }
+        .pipeline-step { display: flex; align-items: flex-start; gap: 1.2rem; position: relative; }
+        .pipeline-step:not(:last-child)::after { content: ''; position: absolute; left: 19px; top: 42px; width: 2px; height: calc(100% - 10px); background: #30363d; }
+        .step-icon { width: 40px; height: 40px; border-radius: 50%; background: #21262d; border: 2px solid #30363d; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; z-index: 1; }
+        .step-icon.active { border-color: #58a6ff; background: #1f6feb22; }
+        .step-icon.azure { border-color: #0078d4; background: #0078d422; }
+        .step-icon.output { border-color: #3fb950; background: #23863622; }
+        .step-body { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; flex: 1; }
+        .step-body h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .step-body p { font-size: 0.83rem; color: #8b949e; line-height: 1.5; }
+        .step-body .tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.6rem; }
+        .step-body .tag-sm { background: #21262d; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; color: #8b949e; }
+
+        /* Code-style folder structure */
+        .folder-tree { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.82rem; line-height: 1.8; overflow-x: auto; }
+        .folder-tree .dir { color: #58a6ff; font-weight: 600; }
+        .folder-tree .file { color: #e6edf3; }
+        .folder-tree .comment { color: #6e7681; }
+        .folder-tree .py { color: #3fb950; }
+        .folder-tree .yml { color: #d29922; }
+        .folder-tree .test { color: #da7b13; }
+
+        /* Conclusion */
+        .conclusion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .conclusion-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; }
+        .conclusion-card.best { border-color: #58a6ff; background: #1f6feb0d; }
+        .conclusion-card.balanced { border-color: #3fb950; background: #2386360d; }
+        .conclusion-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+        .conclusion-card p { font-size: 0.87rem; color: #8b949e; line-height: 1.6; }
+
+        .divider { border: none; border-top: 1px solid #30363d; margin: 0; }
+
+        footer { text-align: center; padding: 2rem; color: #8b949e; font-size: 0.85rem; border-top: 1px solid #30363d; margin-top: 2rem; }
+        footer a { color: #58a6ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="logo">andrees-star</a>
+    <a href="index.html" class="back">← Back to portfolio</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="tag">🤖 MLOps · Machine Learning · Azure</div>
+    <h1>Predicción de <span>Insolvencia Empresarial</span> en Colombia</h1>
+    <p class="meta" style="margin-bottom:0.3rem">Evaluación comparativa de modelos de Machine Learning · Universidad de Antioquia, 2026</p>
+    <p class="meta"><strong>Autor:</strong> Andrés Hernando Cerquera Mejía &nbsp;|&nbsp; <strong>Asesor:</strong> Mauricio Lopera Castaño</p>
+    <div class="hero-links">
+        <a href="Articulo_insolvencia_empresarial_2026.pdf" class="btn btn-primary" target="_blank">📄 Artículo PDF</a>
+        <a href="2df_final_completo_23.xlsx" class="btn btn-outline" target="_blank">📊 Dataset Excel</a>
+        <a href="https://github.com/andrees-star/corporate-insolvency-mlops-azure" class="btn btn-blue" target="_blank">GitHub Repo</a>
+        <a href="index.html" class="btn btn-outline">← Portfolio</a>
+    </div>
+</section>
+
+<!-- STATS -->
+<div class="section">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="num">27,926</div>
+            <div class="label">Empresas en el dataset (Supersociedades)</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">3</div>
+            <div class="label">Modelos comparados: LR, GAM, XGBoost</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">2</div>
+            <div class="label">Horizontes de predicción: 2024 y 2024–2025</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">80%</div>
+            <div class="label">Sensibilidad máxima — XGBoost (H. 2024–2025)</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">0.2550</div>
+            <div class="label">Mejor MCC — Logistic Regression (H. 2024–2025)</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">Ley 1116</div>
+            <div class="label">Marco legal: insolvencia empresarial Colombia (2006)</div>
+        </div>
+    </div>
+
+    <!-- CONTEXT -->
+    <h2 class="section-title">Contexto del <span>Problema</span></h2>
+    <div class="context-grid" style="margin-bottom:3rem">
+        <div class="info-card">
+            <h3>📌 Motivación</h3>
+            <p>La Ley 1116 de 2006 establece el régimen de insolvencia empresarial en Colombia. La detección temprana de empresas en riesgo permite intervenciones oportunas que pueden evitar procesos de liquidación y proteger empleo y economía. Sin embargo, el problema presenta un <strong style="color:#e6edf3">desbalance de clases severo</strong>: las empresas insolventes son menos del 1% del total.</p>
+        </div>
+        <div class="info-card">
+            <h3>🎯 Objetivo</h3>
+            <p>Evaluar de forma comparativa tres modelos de machine learning —Logistic Regression, GAM (Generalized Additive Model) y XGBoost— para predecir insolvencia empresarial en dos horizontes temporales distintos, implementando una solución end-to-end con MLOps sobre Azure Machine Learning.</p>
+        </div>
+        <div class="info-card">
+            <h3>📂 Fuente de Datos</h3>
+            <ul>
+                <li>Superintendencia de Sociedades (Colombia)</li>
+                <li>Estados financieros de ~27,926 empresas</li>
+                <li>Variables: indicadores de liquidez, rentabilidad, endeudamiento, cobertura y tamaño</li>
+                <li>Horizonte 2024: empresas con datos históricos hasta 2023</li>
+                <li>Horizonte 2024–2025: datos extendidos con mayor proporción de insolventes</li>
+            </ul>
+        </div>
+        <div class="info-card">
+            <h3>⚙️ Pipeline de preprocesamiento</h3>
+            <ul>
+                <li><strong style="color:#e6edf3">Winsorización</strong> de outliers extremos por percentiles</li>
+                <li><strong style="color:#e6edf3">Transformación Yeo-Johnson</strong> para normalizar distribuciones sesgadas</li>
+                <li>Separación leakage-safe: transformaciones ajustadas <em>sólo</em> en train</li>
+                <li>Selección de variables con importancia SHAP y filtros estadísticos</li>
+                <li>Calibración de umbral de clasificación para maximizar sensibilidad</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- DATASET -->
+    <h2 class="section-title">Partición del <span>Dataset</span></h2>
+    <div style="overflow-x:auto; margin-bottom:3rem;">
+        <table class="dataset-table">
+            <thead>
+                <tr>
+                    <th>Horizonte</th>
+                    <th>Conjunto</th>
+                    <th>Total</th>
+                    <th><span class="badge-insolvent">Insolventes</span></th>
+                    <th><span class="badge-solvent">No insolventes</span></th>
+                    <th>% Insolventes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="2" style="color:#58a6ff;font-weight:700;vertical-align:middle">Horizonte 2024<br><span style="font-size:0.75rem;color:#8b949e;font-weight:400">(1 año)</span></td>
+                    <td>Entrenamiento</td>
+                    <td>22,340</td>
+                    <td>240</td>
+                    <td>22,100</td>
+                    <td>1.07%</td>
+                </tr>
+                <tr>
+                    <td>Validación</td>
+                    <td>5,586</td>
+                    <td>60</td>
+                    <td>5,526</td>
+                    <td>1.07%</td>
+                </tr>
+                <tr style="border-top:2px solid #30363d;">
+                    <td rowspan="2" style="color:#58a6ff;font-weight:700;vertical-align:middle">Horizonte 2024–2025<br><span style="font-size:0.75rem;color:#8b949e;font-weight:400">(2 años)</span></td>
+                    <td>Entrenamiento</td>
+                    <td>22,340</td>
+                    <td>451</td>
+                    <td>21,889</td>
+                    <td>2.02%</td>
+                </tr>
+                <tr>
+                    <td>Validación</td>
+                    <td>5,586</td>
+                    <td>113</td>
+                    <td>5,473</td>
+                    <td>2.02%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- RESULTS -->
+    <h2 class="section-title">Resultados por <span>Modelo</span></h2>
+    <p style="color:#8b949e; font-size:0.9rem; margin-bottom:1.5rem;">Dado el desbalance de clases, la métrica principal es la <strong style="color:#e6edf3">Sensibilidad</strong> (recall de la clase insolvente), complementada con el <strong style="color:#e6edf3">MCC</strong> (Matthews Correlation Coefficient) como medida global balanceada.</p>
+
+    <div class="horizon-wrapper">
+        <!-- H2024 -->
+        <div class="horizon-card">
+            <div class="horizon-header">
+                <h3>📅 Horizonte 2024 — 1 año</h3>
+                <p>Predicción de insolvencia en el año siguiente</p>
+            </div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Modelo</th>
+                        <th>Sensibilidad</th>
+                        <th>MCC</th>
+                        <th>Error I</th>
+                        <th>Error II</th>
+                        <th>PR-AUC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Logistic Reg.</td>
+                        <td class="metric-mid">70%</td>
+                        <td class="metric-mid">0.2058</td>
+                        <td>10%</td>
+                        <td>30%</td>
+                        <td>0.1079</td>
+                    </tr>
+                    <tr>
+                        <td>GAM</td>
+                        <td class="metric-mid">68%</td>
+                        <td class="metric-mid">0.2083</td>
+                        <td class="metric-good">9%</td>
+                        <td>32%</td>
+                        <td>0.1055</td>
+                    </tr>
+                    <tr class="winner">
+                        <td>XGBoost <span class="crown">👑</span></td>
+                        <td class="metric-good">78%</td>
+                        <td>0.1906</td>
+                        <td class="metric-bad">14%</td>
+                        <td class="metric-good">22%</td>
+                        <td class="metric-good">0.1263</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- H2024-2025 -->
+        <div class="horizon-card">
+            <div class="horizon-header">
+                <h3>📅 Horizonte 2024–2025 — 2 años</h3>
+                <p>Predicción de insolvencia en los dos años siguientes</p>
+            </div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Modelo</th>
+                        <th>Sensibilidad</th>
+                        <th>MCC</th>
+                        <th>Error I</th>
+                        <th>Error II</th>
+                        <th>PR-AUC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Logistic Reg.</td>
+                        <td class="metric-mid">67%</td>
+                        <td class="metric-good">0.2550 ★</td>
+                        <td class="metric-mid">12%</td>
+                        <td>33%</td>
+                        <td>0.1183</td>
+                    </tr>
+                    <tr>
+                        <td>GAM</td>
+                        <td class="metric-mid">66%</td>
+                        <td class="metric-mid">0.2298</td>
+                        <td class="metric-mid">12%</td>
+                        <td>34%</td>
+                        <td>0.1179</td>
+                    </tr>
+                    <tr class="winner">
+                        <td>XGBoost <span class="crown">👑</span></td>
+                        <td class="metric-good">80%</td>
+                        <td class="metric-mid">0.2414</td>
+                        <td class="metric-bad">16%</td>
+                        <td class="metric-good">20%</td>
+                        <td class="metric-mid">0.1251</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p style="color:#6e7681;font-size:0.78rem;margin-bottom:3rem;">★ Mejor MCC absoluto del estudio. Error I = Falsos Positivos (empresas sanas clasificadas como insolventes). Error II = Falsos Negativos (insolventes no detectadas).</p>
+
+    <!-- ARCHITECTURE -->
+    <h2 class="section-title">Arquitectura <span>MLOps</span></h2>
+    <div class="pipeline" style="margin-bottom:3rem;">
+
+        <div class="pipeline-step">
+            <div class="step-icon active">📂</div>
+            <div class="step-body">
+                <h4>Datos históricos financieros</h4>
+                <p>Estados financieros de ~27,926 empresas colombianas obtenidos de la Superintendencia de Sociedades. Indicadores de liquidez, rentabilidad, endeudamiento y cobertura.</p>
+                <div class="tags"><span class="tag-sm">Supersociedades</span><span class="tag-sm">Excel · CSV</span></div>
+            </div>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-icon active">🔍</div>
+            <div class="step-body">
+                <h4>Validación y selección de variables</h4>
+                <p>Detección de inconsistencias, filtrado de variables con alta colinealidad. Selección final de features con importancia SHAP y criterios estadísticos.</p>
+                <div class="tags"><span class="tag-sm">01_data_validation.py</span><span class="tag-sm">02_feature_selection.py</span></div>
+            </div>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-icon active">⚙️</div>
+            <div class="step-body">
+                <h4>Pipeline de preprocesamiento — leakage-safe</h4>
+                <p>Winsorización + Yeo-Johnson ajustados exclusivamente sobre el conjunto de entrenamiento. Las transformaciones se aplican al conjunto de validación sin recalibrar, garantizando integridad del experimento.</p>
+                <div class="tags"><span class="tag-sm">Winsorización</span><span class="tag-sm">Yeo-Johnson</span><span class="tag-sm">custom_transformers.py</span><span class="tag-sm">Scikit-learn Pipeline</span></div>
+            </div>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-icon active">🤖</div>
+            <div class="step-body">
+                <h4>Entrenamiento y calibración de umbral</h4>
+                <p>Entrenamiento de Logistic Regression, GAM y XGBoost con validación cruzada estratificada. Calibración del umbral de clasificación para maximizar sensibilidad bajo restricción de Error Tipo I.</p>
+                <div class="tags"><span class="tag-sm">04_train_model.py</span><span class="tag-sm">05_threshold_tuning.py</span><span class="tag-sm">Cross-val estratificada</span></div>
+            </div>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-icon azure">☁️</div>
+            <div class="step-body">
+                <h4>Azure ML Model Registry</h4>
+                <p>El artefacto de modelo serializado (pickle + metadata YAML) se registra en Azure ML Model Registry con versiones, etiquetas de horizonte y métricas de evaluación embebidas.</p>
+                <div class="tags"><span class="tag-sm">Azure ML</span><span class="tag-sm">06_register_model.py</span><span class="tag-sm">Model Registry</span></div>
+            </div>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-icon azure">🌐</div>
+            <div class="step-body">
+                <h4>Managed Online Endpoint</h4>
+                <p>Despliegue como endpoint REST en Azure ML con score.py personalizado. Permite enviar nuevas empresas en formato JSON y recibir probabilidades de riesgo y clasificación en tiempo real.</p>
+                <div class="tags"><span class="tag-sm">Managed Online Endpoint</span><span class="tag-sm">score.py</span><span class="tag-sm">07_deploy_endpoint.py</span></div>
+            </div>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-icon active">📊</div>
+            <div class="step-body">
+                <h4>Ingesta de nuevas empresas — Excel → JSON</h4>
+                <p>Módulo de conversión que valida y transforma el Excel con datos de nuevas compañías al formato JSON requerido por el endpoint, con control de errores por fila.</p>
+                <div class="tags"><span class="tag-sm">08_score_new_companies.py</span><span class="tag-sm">Pandas</span><span class="tag-sm">Validación de esquema</span></div>
+            </div>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-icon output">✅</div>
+            <div class="step-body">
+                <h4>Output: probabilidades de riesgo y clasificación</h4>
+                <p>El sistema devuelve un Excel con una columna de probabilidad de insolvencia y la etiqueta de clasificación (Riesgo Alto / Bajo) por empresa. Listo para presentación a tomadores de decisión.</p>
+                <div class="tags"><span class="tag-sm">Excel con predicciones</span><span class="tag-sm">Probabilidad de riesgo</span><span class="tag-sm">2df_final_completo_23.xlsx</span></div>
+            </div>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-icon azure">🔄</div>
+            <div class="step-body">
+                <h4>CI/CD — GitHub Actions</h4>
+                <p>Pipelines automatizados para test unitarios, entrenamiento, registro y despliegue en Azure. OIDC para autenticación sin secretos de larga duración.</p>
+                <div class="tags"><span class="tag-sm">ci.yml</span><span class="tag-sm">train-model.yml</span><span class="tag-sm">register-environment.yml</span><span class="tag-sm">azure-oidc-test.yml</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOLDER STRUCTURE -->
+    <h2 class="section-title">Estructura del <span>Proyecto</span></h2>
+    <div class="folder-tree" style="margin-bottom:3rem;">
+<span class="dir">MLOPS-INSOLVENCY-PROJECT/</span>
+├── <span class="dir">.github/workflows/</span>
+│   ├── <span class="yml">azure-oidc-test.yml</span>         <span class="comment"># Auth OIDC sin secretos de larga vida</span>
+│   ├── <span class="yml">ci.yml</span>                      <span class="comment"># Tests + lint en cada PR</span>
+│   ├── <span class="yml">register-environment.yml</span>    <span class="comment"># Registra el entorno Azure ML</span>
+│   └── <span class="yml">train-model.yml</span>             <span class="comment"># Pipeline de entrenamiento en nube</span>
+├── <span class="dir">azureml/</span>
+│   ├── <span class="file">environment.yml</span>             <span class="comment"># Dependencias del entorno ML</span>
+│   └── <span class="file">pipeline.yml</span>               <span class="comment"># Definición del pipeline Azure ML</span>
+├── <span class="dir">src/</span>
+│   ├── <span class="py">01_data_ingestion.py</span>        <span class="comment"># Carga y validación inicial</span>
+│   ├── <span class="py">02_feature_selection.py</span>     <span class="comment"># Selección de variables (SHAP)</span>
+│   ├── <span class="py">03_preprocessing.py</span>         <span class="comment"># Winsorización + Yeo-Johnson</span>
+│   ├── <span class="py">04_train_model.py</span>           <span class="comment"># Entrenamiento LR / GAM / XGBoost</span>
+│   ├── <span class="py">05_threshold_tuning.py</span>      <span class="comment"># Calibración de umbral</span>
+│   ├── <span class="py">06_evaluate_model.py</span>        <span class="comment"># Sensibilidad, MCC, PR-AUC</span>
+│   ├── <span class="py">07_register_model.py</span>        <span class="comment"># Push al Azure ML Model Registry</span>
+│   ├── <span class="py">08_score_new_companies.py</span>   <span class="comment"># Excel → JSON → endpoint → Excel</span>
+│   ├── <span class="py">custom_transformers.py</span>      <span class="comment"># Transformadores Scikit-learn custom</span>
+│   └── <span class="py">score.py</span>                    <span class="comment"># Script de inferencia del endpoint</span>
+├── <span class="dir">tests/</span>
+│   ├── <span class="test">test_preprocessing.py</span>
+│   ├── <span class="test">test_transformers.py</span>
+│   ├── <span class="test">test_scoring.py</span>
+│   └── <span class="test">test_pipeline.py</span>
+├── <span class="file">DECISIONS.md</span>                    <span class="comment"># Log de decisiones técnicas con justificación</span>
+├── <span class="file">PROGRESS.md</span>                     <span class="comment"># Seguimiento de avances del proyecto</span>
+└── <span class="file">README.md</span>                       <span class="comment"># Documentación principal del repositorio</span>
+    </div>
+
+    <!-- CONCLUSIONS -->
+    <h2 class="section-title">Conclusiones <span>Clave</span></h2>
+    <div class="conclusion-grid" style="margin-bottom:3rem;">
+        <div class="conclusion-card best">
+            <h3>👑 XGBoost — Mejor para alerta temprana</h3>
+            <p>XGBoost logra la mayor sensibilidad en ambos horizontes (78% en 2024, 80% en 2024–2025) y el mejor PR-AUC en H2024 (0.1263). Es el modelo recomendado cuando el objetivo prioritario es <strong>no perder casos de insolvencia</strong>, aceptando mayor Error Tipo I.</p>
+        </div>
+        <div class="conclusion-card balanced">
+            <h3>⚖️ Logistic Regression — Mejor MCC global</h3>
+            <p>Con el mayor MCC en H2024–2025 (0.2550), Logistic Regression ofrece el mejor equilibrio global entre clases. Su interpretabilidad y menor Error Tipo I (12%) lo hacen preferible cuando las <strong>falsas alarmas tienen alto costo operativo</strong>.</p>
+        </div>
+        <div class="conclusion-card">
+            <h3>📈 Desbalance de clases: el reto central</h3>
+            <p>Con menos del 2% de insolventes en el dataset, ningún modelo logra métricas absolutas altas. El MCC y la PR-AUC son más informativos que el accuracy. La calibración del umbral fue clave para priorizar la detección de insolventes.</p>
+        </div>
+        <div class="conclusion-card">
+            <h3>🔬 GAM — Interpretabilidad sin sacrificar mucho</h3>
+            <p>El GAM ofrece un rendimiento muy cercano a Logistic Regression con la ventaja de capturar relaciones no lineales entre variables financieras. Útil cuando se requiere explicabilidad ante reguladores o directivos.</p>
+        </div>
+    </div>
+
+    <!-- BACK LINKS -->
+    <div style="text-align:center; padding:2rem 0;">
+        <a href="Articulo_insolvencia_empresarial_2026.pdf" class="btn btn-primary" target="_blank">📄 Leer artículo completo</a>
+        &nbsp;
+        <a href="https://github.com/andrees-star/corporate-insolvency-mlops-azure" class="btn btn-blue" target="_blank">GitHub Repository</a>
+        &nbsp;
+        <a href="index.html" class="btn btn-outline">← Volver al portfolio</a>
+    </div>
+</div>
+
+<hr class="divider">
+<footer>
+    <p>Andrés Cerquera — <a href="https://andrees-star.github.io">andrees-star.github.io</a> · Universidad de Antioquia, 2026</p>
+</footer>
+
+</body>
+</html>
